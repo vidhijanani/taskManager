@@ -1,0 +1,140 @@
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <link rel="stylesheet" href="https://bootswatch.com/5/cosmo/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdn.linearicons.com/free/1.0.0/icon-font.min.css"> 
+    </head>
+    <body>
+        <div class="container">
+            <div class="row offset-md-4 ">
+                <div class="col-md-6 border p-3 mx-4 mt-4">
+                    <div class="row">
+                        <div class="col-md-10 ">
+                           
+
+                            <input type="text" class="form-control" id="task" placeholder="Say something..." data-id="0">
+                            <br>
+                            <span class="text-danger" id="err"></span>
+                        </div>
+                        <div class="col-md-2 d-flex ms-2">
+                            
+                            <button class="btn btn-primary" id="addTask">Add</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 bg-light border p-3 m-4 mt-0 row" id="taskList">
+                    
+                </div>
+            </div>
+        </div>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+
+      <script>
+
+    var tasks = [];
+    var inputval = document.getElementById('task');
+    let taskData = JSON.parse(localStorage.getItem('taskStorage'));
+
+    function displayTasks(){
+        taskData =JSON.parse(localStorage.getItem('taskStorage')); 
+        var output = '';
+
+        if(taskData.length > 0){
+        taskData.forEach((element,index) => {
+            output+= `<div class='col-md-12 row bg-white m-0 mt-1 p-2'>
+                            <div class='col-md-10'>${(element.name)} <br /> <small class='text-muted'>${(element.time)}</small></div>
+                            <div class='col-md-2 text-end'>
+                                <button class='btn' onclick='edit(${index})'><span class="lnr lnr-pencil"></span></button>
+                                <button class='btn' onclick='remove(${index})'><span class="lnr lnr-trash"></span></button></div>
+                            </div>`;
+        });
+        } else{
+            output+= `<div class='col-md-12 row bg-white m-0 mt-1 p-2'>
+                            <div class='col-md-10'> No tasks added</div>
+                           
+                            </div>`;
+        }
+            document.getElementById('taskList').innerHTML = output;
+            // console.log(localStorage.getItem('taskStorage'));
+    }
+    displayTasks();
+
+    document.querySelector('#addTask').addEventListener('click', function(){
+
+        if(inputval.value != ''){
+            addTasks(inputval.value);
+        } else{
+            document.querySelector('#err').innerHTML = 'Add task first.';
+        }
+       
+         
+    })
+
+    function addTasks(inputval){
+        var curVal = document.getElementById('addTask').textContent;
+        // alert(curVal);
+        if(curVal == 'Add'){
+            var oldTasks = JSON.parse(localStorage.getItem('taskStorage'));
+            var tasks = oldTasks;
+            var obj =  { name: inputval , time:moment().format('MMMM Do YYYY, h:mm:ss a') };
+            
+            tasks.push(obj);
+            console.log(tasks);
+            localStorage.setItem('taskStorage', JSON.stringify(tasks));
+            console.log(localStorage.setItem('taskStorage',JSON.stringify(tasks)));
+            document.querySelector('#task').value = '';
+            displayTasks();
+        }else{
+            //get old task and update
+            var taskDate = JSON.parse(localStorage.getItem('taskStorage'));
+
+            var getid = document.getElementById('task').getAttribute('data-id');            
+            alert(inputval);    
+            var taskElement = document.querySelector('#taskList');
+            var obj = {name:inputval,time:moment().format('MMMM Do YYYY, h:mm:ss a')}
+            taskDate.splice(getid,1,obj);
+            localStorage.setItem('taskStorage', JSON.stringify(taskDate));
+
+            displayTasks();
+
+        }
+        
+    }
+
+    function remove(i){
+        var cnf = confirm('Are you sure want to remove ?');
+        if( cnf == true){var getData = JSON.parse(localStorage.getItem('taskStorage'));
+        console.log(getData);
+        var removed = getData.splice(i , 1);
+        localStorage.setItem('taskStorage',JSON.stringify(getData));       
+        console.log(removed);
+        displayTasks();  
+        }else{
+            alert('Your Data is saved')     
+        }
+            }
+
+     //settimeout
+     setTimeout(() => {
+            document.querySelector('#err').innerHTML = '';            
+        }, 3000);
+
+
+        function edit(i){
+            taskData = JSON.parse(localStorage.getItem('taskStorage'));
+            const taskToEdit = taskData[i].name;
+            document.getElementById('task').value = taskToEdit;
+            document.getElementById('addTask').innerText = 'Update';
+            document.getElementById('task').setAttribute('data-id',i);
+
+            displayTasks();      
+        }     
+      </script>
+    </body>
+    </html>
